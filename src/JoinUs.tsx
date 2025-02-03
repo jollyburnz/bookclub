@@ -2,11 +2,43 @@ import React, { useState } from 'react';
 
     function JoinUs() {
       const [email, setEmail] = useState('');
+      const mailerliteGroupId = import.meta.env.MAILERLITE_GROUP_ID;
+      const mailerliteApiKey = import.meta.env.MAILERLITE_API_KEY;
 
-      const handleSubmit = (event: React.FormEvent) => {
+      const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        alert(`Subscribed with email: ${email}`);
-        setEmail('');
+
+        try {
+          const response = await fetch(
+            `https://api.mailerlite.com/api/v2/subscribers`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-MailerLite-ApiKey': mailerliteApiKey,
+              },
+              body: JSON.stringify({
+                email: email,
+                groups: [mailerliteGroupId],
+              }),
+            }
+          );
+
+          if (response.ok) {
+            alert('Successfully subscribed to our newsletter!');
+            setEmail('');
+          } else {
+            const errorData = await response.json();
+            alert(
+              `Subscription failed. Please try again. Error: ${
+                errorData.message || response.statusText
+              }`
+            );
+          }
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          alert('Subscription failed. Please try again later.');
+        }
       };
 
       return (
