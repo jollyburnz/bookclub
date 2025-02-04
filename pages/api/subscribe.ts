@@ -18,7 +18,6 @@ export default async function handler(
     }
 
     try {
-      console.log(apiKey, 'apikey');
       const response: Response = await fetch('https://connect.mailerlite.com/api/subscribers', {
         method: 'POST',
         headers: {
