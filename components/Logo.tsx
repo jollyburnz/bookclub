@@ -10,13 +10,13 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
 
   useEffect(() => {
     if (logoRef.current && animate) {
-      const paths = logoRef.current.querySelectorAll('.cls-3');
+      const paths = logoRef.current.querySelectorAll('.cls-3') as NodeListOf<SVGPathElement | SVGPolylineElement>; // Correct type
       const pathAnimations: anime.AnimeInstance[] = []; // Explicit type annotation
 
       paths.forEach((path, index) => {
         const pathLength = path.getTotalLength();
-        path.setAttribute('stroke-dasharray', pathLength);
-        path.setAttribute('stroke-dashoffset', pathLength);
+        path.setAttribute('stroke-dasharray', pathLength.toString());
+        path.setAttribute('stroke-dashoffset', pathLength.toString());
 
         pathAnimations.push(
           anime({
