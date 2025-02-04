@@ -11,7 +11,7 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
   useEffect(() => {
     if (logoRef.current && animate) {
       const paths = logoRef.current.querySelectorAll('.cls-3');
-      const pathAnimations = [];
+      const pathAnimations: anime.AnimeInstance[] = []; // Explicit type annotation
 
       paths.forEach((path, index) => {
         const pathLength = path.getTotalLength();
