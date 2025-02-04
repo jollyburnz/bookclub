@@ -24,7 +24,7 @@ export default async function handler(
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization:': `Bearer ${apiKey as string}`,
+          'Authorization': `Bearer ${apiKey as string}`,
         },
         body: JSON.stringify({
           email: email,
