@@ -19,11 +19,12 @@ export default async function handler(
 
     try {
       console.log(apiKey, 'apikey');
-      const response: Response = await fetch('https://api.mailerlite.com/api/v2/subscribers', {
+      const response: Response = await fetch('https://connect.mailerlite.com/api/subscribers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-MailerLite-ApiKey': apiKey as string,
+          'Accept': 'application/json',
+          'Authorization:': `Bearer ${apiKey as string}`,
         },
         body: JSON.stringify({
           email: email,
