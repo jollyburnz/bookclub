@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 
     function JoinUs() {
       const [email, setEmail] = useState('');
-      const mailerliteGroupId = import.meta.env.MAILERLITE_GROUP_ID;
-      const mailerliteApiKey = import.meta.env.MAILERLITE_API_KEY;
+      const mailerliteGroupId = import.meta.env.VITE_MAILERLITE_GROUP_ID;
+      const mailerliteApiKey = import.meta.env.VITE_MAILERLITE_API_KEY;
 
       const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
           const response = await fetch(
-            `https://api.mailerlite.com/api/v2/subscribers`,
+            `https://connect.mailerlite.com/api/subscribers`,
             {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'X-MailerLite-ApiKey': mailerliteApiKey,
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${mailerliteApiKey}`,
               },
               body: JSON.stringify({
                 email: email,
