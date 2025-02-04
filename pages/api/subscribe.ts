@@ -1,19 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fetch, { Response } from 'node-fetch';
-import { MailerLiteSuccessResponse, MailerLiteErrorResponse } from '../../types/mailerlite';
 require('dotenv').config();
 
-type Data = MailerLiteSuccessResponse | MailerLiteErrorResponse | { message: string };
-
-// Type guard to check if the response is a MailerLiteSuccessResponse
-function isMailerLiteSuccessResponse(data: any): data is MailerLiteSuccessResponse {
-  return typeof data === 'object' && data !== null && typeof data.message === 'string';
-}
-
-// Type guard to check if the response is a MailerLiteErrorResponse
-function isMailerLiteErrorResponse(data: any): data is MailerLiteErrorResponse {
-  return typeof data === 'object' && data !== null && typeof data.message === 'string';
-}
+type Data =  { message: string, error?: any };
 
 export default async function handler(
   req: NextApiRequest,
@@ -44,20 +33,10 @@ export default async function handler(
       const data = await response.json();
 
       if (response.ok) {
-        if (isMailerLiteSuccessResponse(data)) {
           return res.status(200).json({ message: 'Subscribed successfully' });
-        } else {
-          console.error('Unexpected MailerLite API response:', data);
-          return res.status(500).json({ message: 'Failed to subscribe', error: 'Unexpected response format' });
-        }
       } else {
-        if (isMailerLiteErrorResponse(data)) {
           console.error('MailerLite API error:', data);
           return res.status(500).json({ message: 'Failed to subscribe', error: data });
-        } else {
-          console.error('Unexpected MailerLite API error response:', data);
-          return res.status(500).json({ message: 'Failed to subscribe', error: 'Unexpected error response format' });
-        }
       }
     } catch (error: any) {
       console.error('Error calling MailerLite API:', error);
