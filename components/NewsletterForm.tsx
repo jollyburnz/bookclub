@@ -34,13 +34,13 @@ const NewsletterForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email:</label>
       <input
         type="email"
         id="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        placeholder="Email"
       />
       <button type="submit" disabled={status === 'loading'}>
         {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
