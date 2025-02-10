@@ -1,24 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 
-function Home() {
-  const books = [
-    {
-      title: "The Invisible Landscape",
-      author: "Terence McKenna",
-      description: "A deep dive into the nature of reality and consciousness."
-    },
-    {
-      title: "The Roots of Coincidence",
-      author: "Arthur Koestler",
-      description: "Explores the concept of synchronicity and its implications."
-    },
-    {
-      title: "Entangled Minds",
-      author: "Dean Radin",
-      description: "Examines the scientific evidence for psychic phenomena."
-    }
-  ];
+interface Book {
+  title: string;
+  author: string;
+  description: string;
+}
+
+const Home: React.FC = () => {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch('/api/books');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setBooks(data.books);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Head>
+          <title>Psychical Research Book Club - Home</title>
+        </Head>
+        <h1>Book Club for Psychical Development</h1>
+        <div>Loading...</div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Head>
+          <title>Psychical Research Book Club - Home</title>
+        </Head>
+        <h1>Book Club for Psychical Development</h1>
+        <div>Error: {error}</div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -40,6 +75,6 @@ function Home() {
       </div>
     </>
   );
-}
+};
 
 export default Home;
