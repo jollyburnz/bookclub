@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const auth: JWT | UserRefreshClient | BaseExternalAccountClient | GoogleAuth<any> | OAuth2Client | Compute | undefined = new google.auth.GoogleAuth({
-        credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON || '{}'), // Parse JSON string
+        credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON || '{}'),
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       });
 
@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       sheets.spreadsheets.values.get({
         auth: client,
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: 'Sheet1!A:C', // Adjust sheet name and range as needed
-      }, (err, response) => {
+        range: 'Sheet1!A:C',
+      }, (err: any, response: any) => { // Added explicit types here
         if (err) {
           console.error('Error fetching data from Google Sheet:', err);
           res.status(500).json({ error: 'Failed to fetch data' });
