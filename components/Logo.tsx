@@ -7,9 +7,9 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ animate = true }) => {
   const logoRef = useRef<SVGSVGElement>(null);
+  let animationTimeout: NodeJS.Timeout | null = null; // Moved declaration outside useEffect
 
   useEffect(() => {
-    let animationTimeout: NodeJS.Timeout | null = null;
 
     const startAnimation = () => {
       if (logoRef.current && animate) {
@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
               strokeDashoffset: [pathLength, 0],
               easing: 'easeInOutSine',
               duration: 250,
-              delay: index,
+              delay: index * 100, // Added delay for better visual effect
               autoplay: false,
               direction: 'normal',
               complete: function(anim) {
@@ -51,7 +51,9 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
     }
 
     return () => {
-      clearTimeout(animationTimeout);
+      if (animationTimeout) { // Check if timeout exists before clearing
+        clearTimeout(animationTimeout);
+      }
     };
   }, [animate]);
 
