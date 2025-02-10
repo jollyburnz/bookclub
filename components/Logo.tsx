@@ -9,45 +9,50 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
   const logoRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (logoRef.current && animate) {
-      const paths = logoRef.current.querySelectorAll('.cls-3') as NodeListOf<SVGPathElement | SVGPolylineElement>; // Correct type
-      const pathAnimations: anime.AnimeInstance[] = []; // Explicit type annotation
+    let animationTimeout: NodeJS.Timeout | null = null;
 
-      paths.forEach((path, index) => {
-        const pathLength = path.getTotalLength();
-        path.setAttribute('stroke-dasharray', pathLength.toString());
-        path.setAttribute('stroke-dashoffset', pathLength.toString());
+    const startAnimation = () => {
+      if (logoRef.current && animate) {
+        const paths = logoRef.current.querySelectorAll('.cls-3') as NodeListOf<SVGPathElement | SVGPolylineElement>;
+        const pathAnimations: anime.AnimeInstance[] = [];
 
-        pathAnimations.push(
-          anime({
-            targets: path,
-            strokeDashoffset: [0, anime.setDashoffset],
-            easing: 'easeInOutSine',
-            duration: 1000,
-            autoplay: false,
-            direction: 'alternate',
-          })
-        );
-      });
+        paths.forEach((path, index) => {
+          const pathLength = path.getTotalLength();
+          path.setAttribute('stroke-dasharray', pathLength.toString());
+          path.setAttribute('stroke-dashoffset', pathLength.toString());
 
-      const animateSequentially = (index: number) => {
-        if (index < pathAnimations.length) {
-          pathAnimations[index].play();
-          pathAnimations[index].finished.then(() => {
-            animateSequentially(index + 1);
-          });
-        } else {
-          // loop
-          paths.forEach((path, index) => {
-            pathAnimations[index].play();
-            pathAnimations[index].finished.then(() => {
-              animateSequentially(0);
-            });
-          });
-        }
-      };
-      animateSequentially(0);
+          pathAnimations.push(
+            anime({
+              targets: path,
+              strokeDashoffset: [pathLength, 0],
+              easing: 'easeInOutSine',
+              duration: 250,
+              delay: index,
+              autoplay: false,
+              direction: 'normal',
+              complete: function(anim) {
+                if (index < pathAnimations.length - 1) {
+                  pathAnimations[index + 1].play();
+                }
+              }
+            })
+          );
+        });
+
+        pathAnimations[0].play();
+      }
+    };
+
+    const container = document.querySelector('.container');
+    if (container) {
+      container.addEventListener('transitionend', () => {
+        animationTimeout = setTimeout(startAnimation, 0);
+      }, { once: true });
     }
+
+    return () => {
+      clearTimeout(animationTimeout);
+    };
   }, [animate]);
 
   return (
