@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
+import type { JWT, UserRefreshClient, BaseExternalAccountClient, GoogleAuth, OAuth2Client, Compute } from 'google-auth-library';
 require('dotenv').config();
 
 const sheets = google.sheets('v4');
@@ -7,16 +8,16 @@ const sheets = google.sheets('v4');
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const auth = new google.auth.GoogleAuth({
-        credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON || '{}'),
+      const auth: JWT | UserRefreshClient | BaseExternalAccountClient | GoogleAuth<any> | OAuth2Client | Compute | undefined = new google.auth.GoogleAuth({
+        credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON || '{}'), // Parse JSON string
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       });
 
-      const client: google.auth.OAuth2Client = await auth.getClient(); // Explicit type casting
+      const client: string | JWT | UserRefreshClient | BaseExternalAccountClient | GoogleAuth<any> | OAuth2Client | Compute | undefined = await auth.getClient();
       sheets.spreadsheets.values.get({
         auth: client,
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: 'Sheet1!A:C',
+        range: 'Sheet1!A:C', // Adjust sheet name and range as needed
       }, (err, response) => {
         if (err) {
           console.error('Error fetching data from Google Sheet:', err);
