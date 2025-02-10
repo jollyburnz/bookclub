@@ -7,29 +7,41 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ animate = true }) => {
   const logoRef = useRef<SVGSVGElement>(null);
-  let animationTimeout: NodeJS.Timeout | null = null; // Moved declaration outside useEffect
+  let animationTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
-
     const startAnimation = () => {
       if (logoRef.current && animate) {
         const paths = logoRef.current.querySelectorAll('.cls-3') as NodeListOf<SVGPathElement | SVGPolylineElement>;
+
+        if (!paths.length) {
+          console.error("No paths found with class 'cls-3'");
+          return; // Exit if no paths are found
+        }
+
         const pathAnimations: anime.AnimeInstance[] = [];
 
         paths.forEach((path, index) => {
           const pathLength = path.getTotalLength();
-          path.setAttribute('stroke-dasharray', pathLength.toString());
-          path.setAttribute('stroke-dashoffset', pathLength.toString());
+          path.style.strokeDasharray = `${pathLength} ${pathLength}`;
+          path.style.strokeDashoffset = pathLength.toString();
+          path.style.opacity = '0';
 
           pathAnimations.push(
             anime({
               targets: path,
-              strokeDashoffset: [pathLength, 0],
+              strokeDashoffset: 0,
+              opacity: [0, 1],
               easing: 'easeInOutSine',
               duration: 250,
-              delay: index * 100, // Added delay for better visual effect
+              delay: index * 50,
               autoplay: false,
               direction: 'normal',
+              begin: function(anim) {
+                path.style.strokeDasharray = `${pathLength} ${pathLength}`;
+                path.style.strokeDashoffset = pathLength.toString();
+                path.style.opacity = '0';
+              },
               complete: function(anim) {
                 if (index < pathAnimations.length - 1) {
                   pathAnimations[index + 1].play();
@@ -51,7 +63,7 @@ const Logo: React.FC<LogoProps> = ({ animate = true }) => {
     }
 
     return () => {
-      if (animationTimeout) { // Check if timeout exists before clearing
+      if (animationTimeout) {
         clearTimeout(animationTimeout);
       }
     };
